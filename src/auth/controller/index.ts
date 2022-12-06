@@ -84,3 +84,7 @@ export const refresh = async (req: Request, res: Response) => {
 		return res.status(406).json({ message: "Unauthorized" });
 	}
 };
+
+export const whoami = async (req: Request, res: Response) => {
+	return res.json({ success: true });
+};
