@@ -51,3 +51,36 @@ export const login = async (req: Request, res: Response) => {
 		});
 	}
 };
+
+export const refresh = async (req: Request, res: Response) => {
+	const authHeader = req.headers?.authorization;
+	if (authHeader?.split(" ")[0] === "Bearer") {
+		// Destructuring refreshToken from cookie
+		const refreshToken = authHeader?.split(" ")[1] as string;
+
+		// Verifying refresh token
+		// @ts-ignore
+		jwt.verify(refreshToken, refreshTokenSecret as Secret, (err, decoded) => {
+			console.log(refreshTokenSecret);
+			if (err) {
+				// Wrong Refesh Token
+				return res.status(406).json({ message: "Unauthorized" });
+			} else {
+				// Correct token we send a new access token
+				const accessToken = jwt.sign(
+					{
+						username: userCredentials.username,
+						email: userCredentials.email,
+					},
+					accessTokenSecret as Secret,
+					{
+						expiresIn: "5m",
+					}
+				);
+				return res.json({ accessToken });
+			}
+		});
+	} else {
+		return res.status(406).json({ message: "Unauthorized" });
+	}
+};
